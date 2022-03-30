@@ -12,7 +12,11 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
-    
+
+    //If there is a new high score, we print it for 1.5 seconds on the screen
+    public GameObject newHighScore;
+    private float newHighScoreTime = 1.5f;
+
     private bool m_Started = false;
     private int m_Points;
     
@@ -35,6 +39,12 @@ public class MainManager : MonoBehaviour
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
             }
+        }
+        if (SaveManager.Instance.newHighScore)
+        {
+            SaveManager.Instance.newHighScore = false;
+            newHighScore.SetActive(true);
+            StartCoroutine(newHighScoreDespawn(newHighScoreTime));
         }
     }
 
@@ -72,5 +82,13 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        SaveManager.Instance.SavePlayerScore(m_Points);
+    }
+
+    IEnumerator newHighScoreDespawn(float time)
+    {
+        yield return new WaitForSeconds(time);
+        newHighScore.SetActive(false);
     }
 }
